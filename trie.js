@@ -31,18 +31,4 @@ Trie.prototype = {
 		if (this.keys[letter])
 			return this.keys[letter].lookup(rest);
 	},
-
-	toDict: function () {
-		var dict = [];
-		this._toDict(dict, "");
-		return dict;
-	},
-
-	_toDict: function (dict, partial_word) {
-		if (this._end)
-			dict.push(partial_word);
-
-		for (letter in this.keys)
-			this.keys[letter]._toDict(dict, partial_word + letter);
-	},
 };
