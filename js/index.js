@@ -16,20 +16,47 @@ function createBoard () {
 		$grid.append(row);
 	}
 
-	$('.cell').change(function(){
+	$('.cell').on("input", function () {
 		var c = $(this).data('col'), r = $(this).data('row');
 		ruzzle.board[r][c] = $(this).val().toUpperCase();
 	});
 }
 
+function solveBoard () {
+	$("#solutions").show();
+
+	$("#solving").show();
+	ruzzle.solve();
+	$("#solving").hide();
+
+	$("#num-words").text(ruzzle.solutions.length + " words");
+	$("#wordlist").empty();
+	for (var i = 0; i < ruzzle.solutions.length; i++) {
+		sol = ruzzle.solutions[i];
+		$("#wordlist").append($("<li>").text(sol.word))
+	}
+}
 
 function init () {
-	$("#solve-button").click(function () {
-		$("#solutions").fadeIn();
-	});
+	var dict = new Trie();
 
 	$("#solutions").hide();
-	ruzzle = new Ruzzle({});
+	$("#solve-button").on("click", solveBoard);
+
+	$("#ruzzle-board *").hide();
+	$("#loading").show();
+	$.get("list.txt")
+		.done(function (data) {
+			var words = data.split("\n");
+			words.forEach(dict.insert, dict);
+			$("#ruzzle-board *").show();
+			$("#loading").hide();
+		})
+		.fail(function (data) {
+			$("#loading").text("Failed to load the dictionary...");
+		});
+
+	ruzzle = new Ruzzle(dict);
 	createBoard();
 }
 
